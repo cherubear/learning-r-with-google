@@ -1,0 +1,22 @@
+---
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+## Pipes
+
+This is an exmaple of filtering and sorting data without using pipes:
+```{r}
+data("ToothGrowth")
+filtered_tg = filter(ToothGrowth, dose==0.5)
+arrange(filtered_tg,len)
+```
+
+And this is how the same can be done with pipes:
+```{r}
+filtered_toothgrowth = ToothGrowth %>%
+  filter(dose==0.5) %>%
+  arrange(len) %>% group_by(supp) %>%
+  summarise(mean_len=mean(len, na.rm=T), .group="drop") #this step is additional
+```

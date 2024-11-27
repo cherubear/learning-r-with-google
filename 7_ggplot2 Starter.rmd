@@ -1,0 +1,146 @@
+---
+title: "ggplot2 Basics"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+## Preparing the data
+
+```{r install packages}
+install.packages("tidyverse")
+install.packages("palmerpenguins")
+```
+
+Once a package is installed, you can load it by running the `library()`
+function with the package name inside the parentheses:
+
+```{r load packages}
+library(tidyverse)
+library(palmerpenguins)
+```
+
+## Getting started with ggplot2
+
+```{r}
+data("penguins")
+ggplot(data=penguins) + geom_point(mapping=aes(x=flipper_length_mm, y=body_mass_g))
+ggplot(data=penguins, mapping=aes(x=flipper_length_mm, y=body_mass_g)) + geom_point()
+# the above two lines of code work the same
+```
+
+**ggplot(data = penguins)**: In ggplot2, you begin a plot with the ggplot() function. The ggplot() function creates a coordinate system that you can add layers to. The first argument of the ggplot() function is the dataset to use in the plot. In this case, it’s “penguins.”
+
+**+**: Then, you add a “+” symbol to add a new layer to your plot. You complete your plot by adding one or more layers to ggplot().
+
+**geom_point()**: Next, you choose a geom by adding a geom function. The geom_point() function uses points to create **scatterplots**, the geom_bar function uses bars to create bar charts, and so on. In this case, choose the geom_point function to create a scatter plot of points. The ggplot2 package comes with many different geom functions. You’ll learn more about geoms later in this course.
+
+**(mapping = aes(x = flipper_length_mm, y = body_mass_g))**: Each geom function in ggplot2 takes a mapping argument. This defines how variables in your dataset are mapped to visual properties. The mapping argument is always paired with the aes() function. The x and y arguments of the aes() function specify which variables to map to the x-axis and the y-axis of the coordinate system. In this case, you want to map the variable “flipper_length_mm” to the x-axis, and the variable “body_mass_g” to the y-axis. 
+
+## Enhancing visualization with aes (aesthetics)
+
+```{r}
+ggplot(data=penguins) + geom_point(mapping=aes(x=flipper_length_mm, y=body_mass_g, color=species))
+```
+
+Then we will try playing with the three common aesthetics - color, shape and size. We can also change the alpha (transparency).
+
+```{r}
+ggplot(data=penguins) + geom_point(mapping=aes(x=flipper_length_mm, y=body_mass_g, shape=species))
+```
+
+```{r}
+ggplot(data=penguins) + geom_point(mapping=aes(x=flipper_length_mm, y=body_mass_g, color=species, shape=species))
+```
+
+```{r}
+ggplot(data = penguins) + geom_point(mapping = aes(x=flipper_length_mm, y=body_mass_g, color=species, shape=species, size=species))
+```
+
+```{r}
+ggplot(data=penguins) + geom_point(mapping=aes(x=flipper_length_mm, y=body_mass_g, color=species, alpha=species))
+```
+
+```{r}
+ggplot(data=penguins) + geom_point(mapping=aes(x=flipper_length_mm, y=body_mass_g),color="purple")
+# note the color should be OUTSIDE of the aes function if set to a constant value
+```
+
+## Exploring geoms
+
+The geom_smooth can show general trend of the data.
+```{r}
+ggplot(data=penguins) + geom_smooth(mapping=aes(x=flipper_length_mm, y=body_mass_g))
+```
+
+We can also combine two types of geoms, like this:
+```{r}
+ggplot(data=penguins) + geom_smooth(mapping=aes(x=flipper_length_mm, y=body_mass_g)) + geom_point(mapping=aes(x=flipper_length_mm, y=body_mass_g, color=species))
+```
+
+We can fit multiple lines, like this:
+```{r}
+ggplot(data=penguins) + geom_smooth(mapping=aes(x=flipper_length_mm, y=body_mass_g, linetype=species))
+```
+
+Here are a few more geom types.
+
+```{r}
+ggplot(data=penguins) + geom_jitter(mapping=aes(x=flipper_length_mm, y=body_mass_g))
+```
+
+```{r}
+ggplot(data=diamonds) + geom_bar(mapping=aes(x=cut))
+```
+
+The color parameter changes the color of border. We will need to use the fill parameter to change the color of bars.
+```{r}
+ggplot(data=diamonds) + geom_bar(mapping=aes(x=cut, color=cut))
+```
+
+```{r}
+ggplot(data=diamonds) + geom_bar(mapping=aes(x=cut, fill=cut))
+```
+
+We can also use the fill param to build a stacked bar chart.
+```{r}
+ggplot(data=diamonds) + geom_bar(mapping=aes(x=cut, fill=clarity))
+```
+
+## Subsetting with Facet
+
+To facet the plot with a single variable, use facet_wrap()
+```{r}
+ggplot(data=penguins) + geom_point(mapping=aes(x=flipper_length_mm, y=body_mass_g, color=species)) + facet_wrap(~species)
+```
+
+```{r}
+ggplot(data=diamonds) + geom_bar(mapping=aes(x=clarity, fill=cut)) + facet_wrap(~cut)
+```
+
+To facet the plot with two variables, use facet_grid()
+```{r}
+ggplot(data=penguins) + geom_point(mapping=aes(x=flipper_length_mm, y=body_mass_g, color=species)) + facet_grid(sex~species)
+```
+
+## Exploring theme
+
+Adjust the text orientation to make labels easier to read
+```{r}
+ggplot(data=diamonds) + geom_bar(mapping=aes(x=clarity, fill=cut)) + facet_wrap(~cut) + theme(axis.text.x = element_text(angle = 90))
+```
+
+## Labels and annotations
+
+Use labs() to add titles and labels:
+```{r}
+ggplot(data=penguins) + geom_point(mapping=aes(x=flipper_length_mm, y=body_mass_g, color=species)) + labs(title="Palmer Penguins: Flipper Length vs. Body Mass", subtitle="Sample of Three Penguin Species", caption = "Data collected by Dr. Kristen Gorman") + annotate("text", x=220, y=3500, label="The Gentoos are the largest", color="purple", fontface="bold", size=4.5, angle=25)
+```
+
+## Saving the plot
+
+It can be done in RStudio export function, but here is how it can be done with code:
+```{r}
+ggsave("penguin_species.png") # saves the last plot generated
+```
